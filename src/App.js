@@ -38,20 +38,18 @@ function App() {
       <header className="App-header">
         <h1>Bridge Facile - Arbitrage</h1>
         
-        <div style={{ 
-          fontSize: '12px', 
-          marginBottom: '15px',
-          padding: '5px 10px',
-          borderRadius: '4px',
-          backgroundColor: connectionStatus === 'connected' ? '#d4edda' : 
-                          connectionStatus === 'error' ? '#f8d7da' : '#fff3cd',
-          color: connectionStatus === 'connected' ? '#155724' : 
-                 connectionStatus === 'error' ? '#721c24' : '#856404'
-        }}>
-          {connectionStatus === 'testing' && '🔄 Test de connexion...'}
-          {connectionStatus === 'connected' && '✅ Connecté à la base de données'}
-          {connectionStatus === 'error' && '❌ Erreur de connexion - Mode données fictives'}
-        </div>
+        {connectionStatus === 'error' && (
+          <div style={{ 
+            fontSize: '12px', 
+            marginBottom: '15px',
+            padding: '5px 10px',
+            borderRadius: '4px',
+            backgroundColor: '#f8d7da',
+            color: '#721c24'
+          }}>
+            ❌ Erreur de connexion - Mode données fictives
+          </div>
+        )}
       </header>
       
       <main style={{ padding: '20px', textAlign: 'left', maxWidth: '1400px', margin: '0 auto' }}>
