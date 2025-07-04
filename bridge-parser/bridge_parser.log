@@ -1,0 +1,157 @@
+2025-07-03 23:22:31,478 - ERROR - 💥 System initialization failed: Invalid URL
+2025-07-03 23:22:31,479 - ERROR - 💥 Fatal error: Invalid URL
+2025-07-03 23:30:33,791 - INFO - HTTP Request: GET https://aqokcjsmajnpfkladubp.supabase.co/rest/v1/code_laws?select=id%2Claw_number%2Ccontent%2Ctitle "HTTP/2 200 OK"
+2025-07-03 23:30:33,805 - INFO - 🔍 Loaded 18 existing laws for duplicate detection
+2025-07-03 23:30:33,806 - INFO - ✅ Enhanced Supabase Manager initialized
+2025-07-03 23:30:33,806 - INFO - ✅ Database manager initialized
+2025-07-03 23:30:33,817 - INFO - 🗄️  Setting up enhanced database schema...
+2025-07-03 23:30:33,817 - INFO - ✅ Database schema ready
+2025-07-03 23:30:33,817 - INFO - 🔧 Available parsing methods: pdfplumber, pypdf2
+2025-07-03 23:30:33,817 - INFO - ✅ PDF parser initialized
+2025-07-03 23:30:33,817 - INFO - ✅ Navigation system initialized
+2025-07-03 23:30:33,817 - INFO - 🚀 Complete Bridge Parser System ready!
+2025-07-03 23:30:33,817 - INFO - 🧪 Running system tests only...
+2025-07-03 23:30:33,817 - INFO - 🧪 Running system functionality tests...
+2025-07-03 23:30:33,890 - INFO - HTTP Request: GET https://aqokcjsmajnpfkladubp.supabase.co/rest/v1/code_laws?select=%2A&limit=1 "HTTP/2 206 Partial Content"
+2025-07-03 23:30:33,968 - INFO - HTTP Request: GET https://aqokcjsmajnpfkladubp.supabase.co/rest/v1/code_laws?select=category "HTTP/2 400 Bad Request"
+2025-07-03 23:30:33,969 - ERROR - ❌ Error getting stats for code_laws: {'message': 'column code_laws.category does not exist', 'code': '42703', 'hint': None, 'details': None}
+2025-07-03 23:30:34,027 - INFO - HTTP Request: GET https://aqokcjsmajnpfkladubp.supabase.co/rest/v1/law_references?select=%2A&limit=1 "HTTP/2 200 OK"
+2025-07-03 23:30:34,087 - INFO - HTTP Request: GET https://aqokcjsmajnpfkladubp.supabase.co/rest/v1/rnc_articles?select=%2A&limit=1 "HTTP/2 206 Partial Content"
+2025-07-03 23:30:34,155 - INFO - HTTP Request: GET https://aqokcjsmajnpfkladubp.supabase.co/rest/v1/conventions?select=%2A&limit=1 "HTTP/2 404 Not Found"
+2025-07-03 23:30:34,156 - ERROR - ❌ Error getting stats for conventions: {'message': 'relation "public.conventions" does not exist', 'code': '42P01', 'hint': None, 'details': None}
+2025-07-03 23:30:34,158 - INFO - 🧪 Test Results:
+2025-07-03 23:30:34,159 - INFO -    database_connection: ✅ PASS
+2025-07-03 23:30:34,159 - INFO -    pdf_parsing_methods: ✅ PASS
+2025-07-03 23:30:34,159 - INFO -    duplicate_detection: ✅ PASS
+2025-07-03 23:30:34,159 - INFO -    navigation_system: ✅ PASS
+2025-07-03 23:30:34,159 - INFO -    law_references: ✅ PASS
+2025-07-03 23:30:34,159 - INFO - 🎉 All tests passed!
+2025-07-03 23:47:29,262 - INFO - HTTP Request: GET https://aqokcjsmajnpfkladubp.supabase.co/rest/v1/code_laws?select=id%2Claw_number%2Ccontent%2Ctitle "HTTP/2 200 OK"
+2025-07-03 23:47:29,283 - INFO - 🔍 Loaded 18 existing laws for duplicate detection
+2025-07-03 23:47:29,283 - INFO - ✅ Enhanced Supabase Manager initialized
+2025-07-03 23:47:29,284 - INFO - ✅ Database manager initialized
+2025-07-03 23:47:29,294 - INFO - 🗄️  Setting up enhanced database schema...
+2025-07-03 23:47:29,294 - INFO - ✅ Database schema ready
+2025-07-03 23:47:29,294 - INFO - 🔧 Available parsing methods: pdfplumber, pypdf2
+2025-07-03 23:47:29,294 - INFO - ✅ PDF parser initialized
+2025-07-03 23:47:29,294 - INFO - ✅ Navigation system initialized
+2025-07-03 23:47:29,294 - INFO - 🚀 Complete Bridge Parser System ready!
+2025-07-03 23:47:29,294 - INFO - 🎯 Starting complete processing pipeline
+2025-07-03 23:47:29,294 - INFO - 📁 Source directory: /Users/lekibbitz/Desktop/BridgeFacile/Code 2017-Test
+2025-07-03 23:47:29,294 - INFO - 🗑️  Clear existing data: True
+2025-07-03 23:47:29,294 - INFO - 🧪 Test mode: True
+2025-07-03 23:47:29,295 - ERROR - 💥 Processing pipeline failed: PDF directory not found: /Users/lekibbitz/Desktop/BridgeFacile/Code 2017-Test
+2025-07-03 23:47:29,295 - ERROR - ❌ Processing completed with errors!
+2025-07-03 23:49:32,965 - INFO - HTTP Request: GET https://aqokcjsmajnpfkladubp.supabase.co/rest/v1/code_laws?select=id%2Claw_number%2Ccontent%2Ctitle "HTTP/2 200 OK"
+2025-07-03 23:49:32,983 - INFO - 🔍 Loaded 18 existing laws for duplicate detection
+2025-07-03 23:49:32,983 - INFO - ✅ Enhanced Supabase Manager initialized
+2025-07-03 23:49:32,983 - INFO - ✅ Database manager initialized
+2025-07-03 23:49:32,992 - INFO - 🗄️  Setting up enhanced database schema...
+2025-07-03 23:49:32,992 - INFO - ✅ Database schema ready
+2025-07-03 23:49:32,992 - INFO - 🔧 Available parsing methods: pdfplumber, pypdf2
+2025-07-03 23:49:32,992 - INFO - ✅ PDF parser initialized
+2025-07-03 23:49:32,992 - INFO - ✅ Navigation system initialized
+2025-07-03 23:49:32,992 - INFO - 🚀 Complete Bridge Parser System ready!
+2025-07-03 23:49:32,992 - INFO - 🎯 Starting complete processing pipeline
+2025-07-03 23:49:32,992 - INFO - 📁 Source directory: /Users/lekibbitz/Desktop/BF3-Manus-Code 2017-Test
+2025-07-03 23:49:32,992 - INFO - 🗑️  Clear existing data: True
+2025-07-03 23:49:32,993 - INFO - 🧪 Test mode: True
+2025-07-03 23:49:33,027 - INFO - 📄 Found 4 PDF files to process
+2025-07-03 23:49:33,027 - INFO - 🗑️  Clearing existing database data...
+2025-07-03 23:49:33,122 - INFO - HTTP Request: GET https://aqokcjsmajnpfkladubp.supabase.co/rest/v1/code_laws?select=id "HTTP/2 200 OK"
+2025-07-03 23:49:33,223 - INFO - HTTP Request: DELETE https://aqokcjsmajnpfkladubp.supabase.co/rest/v1/code_laws?id=neq.0 "HTTP/2 400 Bad Request"
+2025-07-03 23:49:33,224 - ERROR - ❌ Error clearing code_laws: {'message': 'invalid input syntax for type uuid: "0"', 'code': '22P02', 'hint': None, 'details': None}
+2025-07-03 23:49:33,309 - INFO - HTTP Request: GET https://aqokcjsmajnpfkladubp.supabase.co/rest/v1/law_references?select=id "HTTP/2 200 OK"
+2025-07-03 23:49:33,396 - INFO - HTTP Request: DELETE https://aqokcjsmajnpfkladubp.supabase.co/rest/v1/law_references?id=neq.0 "HTTP/2 400 Bad Request"
+2025-07-03 23:49:33,397 - ERROR - ❌ Error clearing law_references: {'message': 'invalid input syntax for type uuid: "0"', 'code': '22P02', 'hint': None, 'details': None}
+2025-07-03 23:49:33,397 - INFO - ✅ Cleared data: {'code_laws': 0, 'law_references': 0}
+2025-07-03 23:49:33,397 - INFO - 📚 Starting PDF processing...
+2025-07-03 23:49:33,493 - INFO - 📄 Parsing: Code 2017-3.pdf
+2025-07-03 23:49:33,549 - INFO - 📖 Page 1/10: Found 0 laws
+2025-07-03 23:49:33,554 - INFO - 📖 Page 2/10: Found 0 laws
+2025-07-03 23:49:33,571 - INFO - 📖 Page 3/10: Found 0 laws
+2025-07-03 23:49:33,586 - INFO - 📖 Page 4/10: Found 0 laws
+2025-07-03 23:49:33,610 - INFO - 📖 Page 5/10: Found 0 laws
+2025-07-03 23:49:33,626 - INFO - 📖 Page 6/10: Found 0 laws
+2025-07-03 23:49:33,635 - INFO - 📖 Page 7/10: Found 0 laws
+2025-07-03 23:49:33,671 - INFO - 📖 Page 8/10: Found 0 laws
+2025-07-03 23:49:33,697 - INFO - 📖 Page 9/10: Found 0 laws
+2025-07-03 23:49:33,725 - INFO - 📖 Page 10/10: Found 0 laws
+2025-07-03 23:49:33,725 - INFO - 🛑 Stopping at page 10 (testing limit)
+2025-07-03 23:49:33,725 - INFO - ✅ Code 2017-3.pdf: 0 laws extracted
+2025-07-03 23:49:33,725 - INFO - 📄 Parsing: Code 2017-1.pdf
+2025-07-03 23:49:33,739 - INFO - 📖 Page 1/10: Found 0 laws
+2025-07-03 23:49:33,740 - INFO - 📖 Page 2/10: Found 0 laws
+2025-07-03 23:49:33,740 - INFO - 📖 Page 3/10: Found 0 laws
+2025-07-03 23:49:33,788 - INFO - 📖 Page 4/10: Found 0 laws
+2025-07-03 23:49:33,822 - INFO - 📖 Page 5/10: Found 0 laws
+2025-07-03 23:49:33,914 - INFO - 📖 Page 6/10: Found 0 laws
+2025-07-03 23:49:34,016 - INFO - 📖 Page 7/10: Found 0 laws
+2025-07-03 23:49:34,108 - INFO - 📖 Page 8/10: Found 0 laws
+2025-07-03 23:49:34,233 - INFO - 📖 Page 9/10: Found 0 laws
+2025-07-03 23:49:34,328 - INFO - 📖 Page 10/10: Found 0 laws
+2025-07-03 23:49:34,328 - INFO - 🛑 Stopping at page 10 (testing limit)
+2025-07-03 23:49:34,329 - INFO - ✅ Code 2017-1.pdf: 0 laws extracted
+2025-07-03 23:49:34,329 - INFO - 📄 Parsing: Code 2017-4.pdf
+2025-07-03 23:49:34,360 - INFO - 📖 Page 1/10: Found 0 laws
+2025-07-03 23:49:34,385 - INFO - 📖 Page 2/10: Found 0 laws
+2025-07-03 23:49:34,421 - INFO - 📖 Page 3/10: Found 0 laws
+2025-07-03 23:49:34,448 - INFO - 📖 Page 4/10: Found 0 laws
+2025-07-03 23:49:34,466 - INFO - 📖 Page 5/10: Found 0 laws
+2025-07-03 23:49:34,482 - INFO - 📖 Page 6/10: Found 0 laws
+2025-07-03 23:49:34,553 - INFO - 📖 Page 7/10: Found 0 laws
+2025-07-03 23:49:34,591 - INFO - 📖 Page 8/10: Found 0 laws
+2025-07-03 23:49:34,618 - INFO - 📖 Page 9/10: Found 0 laws
+2025-07-03 23:49:34,640 - INFO - 📖 Page 10/10: Found 0 laws
+2025-07-03 23:49:34,640 - INFO - 🛑 Stopping at page 10 (testing limit)
+2025-07-03 23:49:34,640 - INFO - ✅ Code 2017-4.pdf: 0 laws extracted
+2025-07-03 23:49:34,640 - INFO - 📄 Parsing: Code 2017-6.pdf
+2025-07-03 23:49:34,671 - INFO - 📖 Page 1/10: Found 0 laws
+2025-07-03 23:49:34,680 - INFO - 📖 Page 2/10: Found 0 laws
+2025-07-03 23:49:34,723 - INFO - 📖 Page 3/10: Found 0 laws
+2025-07-03 23:49:34,762 - INFO - 📖 Page 4/10: Found 0 laws
+2025-07-03 23:49:34,792 - INFO - 📖 Page 5/10: Found 0 laws
+2025-07-03 23:49:34,803 - INFO - 📖 Page 6/10: Found 0 laws
+2025-07-03 23:49:34,828 - INFO - 📖 Page 7/10: Found 0 laws
+2025-07-03 23:49:34,845 - INFO - 📖 Page 8/10: Found 0 laws
+2025-07-03 23:49:34,884 - INFO - 📖 Page 9/10: Found 0 laws
+2025-07-03 23:49:34,900 - INFO - 📖 Page 10/10: Found 0 laws
+2025-07-03 23:49:34,900 - INFO - 🛑 Stopping at page 10 (testing limit)
+2025-07-03 23:49:34,900 - INFO - ✅ Code 2017-6.pdf: 0 laws extracted
+2025-07-03 23:49:34,900 - INFO - 📊 PROCESSING COMPLETE
+2025-07-03 23:49:34,900 - INFO - 📁 Files processed: 4/4
+2025-07-03 23:49:34,900 - INFO - ⚖️  Laws extracted: 0
+2025-07-03 23:49:34,900 - INFO - 🔗 References found: 0
+2025-07-03 23:49:34,900 - INFO - ⏱️  Duration: 1.5 seconds
+2025-07-03 23:49:34,900 - INFO - ❌ Errors: 0
+2025-07-03 23:49:34,900 - INFO - 📊 Gathering database statistics...
+2025-07-03 23:49:34,993 - INFO - HTTP Request: GET https://aqokcjsmajnpfkladubp.supabase.co/rest/v1/code_laws?select=%2A&limit=1 "HTTP/2 206 Partial Content"
+2025-07-03 23:49:35,100 - INFO - HTTP Request: GET https://aqokcjsmajnpfkladubp.supabase.co/rest/v1/code_laws?select=category "HTTP/2 400 Bad Request"
+2025-07-03 23:49:35,100 - ERROR - ❌ Error getting stats for code_laws: {'message': 'column code_laws.category does not exist', 'code': '42703', 'hint': None, 'details': None}
+2025-07-03 23:49:35,174 - INFO - HTTP Request: GET https://aqokcjsmajnpfkladubp.supabase.co/rest/v1/law_references?select=%2A&limit=1 "HTTP/2 200 OK"
+2025-07-03 23:49:35,272 - INFO - HTTP Request: GET https://aqokcjsmajnpfkladubp.supabase.co/rest/v1/rnc_articles?select=%2A&limit=1 "HTTP/2 206 Partial Content"
+2025-07-03 23:49:35,378 - INFO - HTTP Request: GET https://aqokcjsmajnpfkladubp.supabase.co/rest/v1/conventions?select=%2A&limit=1 "HTTP/2 404 Not Found"
+2025-07-03 23:49:35,379 - ERROR - ❌ Error getting stats for conventions: {'message': 'relation "public.conventions" does not exist', 'code': '42P01', 'hint': None, 'details': None}
+2025-07-03 23:49:35,380 - INFO - 🧭 Setting up navigation system...
+2025-07-03 23:49:35,380 - INFO - ⚡ Running database optimization...
+2025-07-03 23:49:35,380 - INFO - ⚡ Starting database optimization...
+2025-07-03 23:49:35,464 - INFO - HTTP Request: POST https://aqokcjsmajnpfkladubp.supabase.co/rest/v1/rpc/remove_duplicate_references "HTTP/2 404 Not Found"
+2025-07-03 23:49:35,465 - ERROR - ❌ Database optimization failed: {'message': 'Could not find the function public.remove_duplicate_references without parameters in the schema cache', 'code': 'PGRST202', 'hint': 'Perhaps you meant to call the function public.detect_law_references', 'details': 'Searched for the function public.remove_duplicate_references without parameters or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.'}
+2025-07-03 23:49:35,466 - INFO - ============================================================
+2025-07-03 23:49:35,466 - INFO - 🎉 PROCESSING COMPLETE - SUMMARY
+2025-07-03 23:49:35,466 - INFO - ============================================================
+2025-07-03 23:49:35,466 - INFO - 📄 PDF Processing:
+2025-07-03 23:49:35,466 - INFO -    Files processed: 4/4
+2025-07-03 23:49:35,466 - INFO -    Laws extracted: 0
+2025-07-03 23:49:35,466 - INFO -    References found: 0
+2025-07-03 23:49:35,466 - INFO -    Duration: 1.5 seconds
+2025-07-03 23:49:35,467 - INFO -    Errors: 0
+2025-07-03 23:49:35,467 - INFO - 🗄️  Database Status:
+2025-07-03 23:49:35,467 - INFO -    code_laws: 0 records
+2025-07-03 23:49:35,467 - INFO -    law_references: 0 records
+2025-07-03 23:49:35,467 - INFO -    rnc_articles: 5 records
+2025-07-03 23:49:35,467 - INFO -    conventions: 0 records
+2025-07-03 23:49:35,467 - INFO - 🧭 Navigation: Ready
+2025-07-03 23:49:35,467 - INFO - ✅ PIPELINE COMPLETED SUCCESSFULLY
+2025-07-03 23:49:35,467 - INFO - ============================================================
+2025-07-03 23:49:35,467 - INFO - 🎉 Processing completed successfully!
