@@ -196,6 +196,30 @@ const BiddingCategories = () => {
                       {categoryDescriptions[doc.document_type.replace('CAT', '')].split('\n\n')[1]}
                     </div>
                   </>
+                ) : doc.document_type === 'SHA' ? (
+                  <>
+                    <div style={{ 
+                      fontSize: '14px',
+                      fontWeight: 'bold',
+                      color: '#2e7d32',
+                      textAlign: 'left',
+                      lineHeight: '1.2',
+                      margin: '0'
+                    }}>
+                      {categoryDescriptions[doc.document_type.replace('CAT', '')].split('\n\n')[0]}
+                    </div>
+                    <div style={{ 
+                      fontSize: '14px',
+                      fontWeight: 'bold',
+                      color: '#666666',
+                      textAlign: 'left',
+                      lineHeight: '1.2',
+                      margin: '0',
+                      marginTop: '4px'
+                    }}>
+                      {categoryDescriptions[doc.document_type.replace('CAT', '')].split('\n\n')[1]}
+                    </div>
+                  </>
                 ) : (
                   <div style={{ 
                     fontSize: '14px',

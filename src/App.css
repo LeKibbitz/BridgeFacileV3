@@ -20,12 +20,12 @@
 
 .title-block {
   color: #2c3e50;
-  margin: 0 0 20px 0;
-  font-size: 20px;
+  margin: 0;
+  font-size: 18px;
   font-weight: bold;
-  min-height: 50px;
   display: flex;
-  align-items: top;
+  align-items: center;
+  gap: 8px;
 }
 
 .App-header nav ul {

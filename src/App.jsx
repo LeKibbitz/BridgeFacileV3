@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import { supabase } from './supabaseClient';
-import CodeLaws from './components/CodeLaws.js';
-import RncArticles from './components/RncArticles.js';
-import BiddingCategories from './components/BiddingCategories.js';
+import CodeLaws from './components/CodeLaws.jsx';
+import RncNavigator from './components/RncNavigator.jsx';
+import BiddingCategories from './components/BiddingCategories.jsx';
 
 // Fonction de test de connexion Supabase
 async function testConnection() {
@@ -96,7 +96,7 @@ function App() {
               </h3>
             </div>
             <div style={{ padding: '20px' }}>
-              <RncArticles />
+              <RncNavigator />
             </div>
           </div>
 
@@ -115,7 +115,7 @@ function App() {
                 🃏 Conventions & Systèmes Autorisés
               </h3>
             </div>
-            <div style={{ padding: '20px' }}>
+            <div style={{ padding: '10px' }}>
               <BiddingCategories />
             </div>
           </div>
