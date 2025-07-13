@@ -125,7 +125,6 @@ Article 5 – Organisation
             try {
                 await parseRNC(tempFilePath);
 
-                // Verify that database queries were called with correct structure
                 const queryCalls = global.pool.query.mock.calls;
                 
                 // Check for title insertion
@@ -164,28 +163,156 @@ Article 5 – Organisation
                 expect(queryCalls[7][0]).toContain('INSERT INTO rnc_article_hierarchy');
                 expect(queryCalls[7][1][2]).toBe(1); // hierarchy level
             } finally {
-                // Clean up
                 fs.unlinkSync(tempFilePath);
             }
         });
 
-        it('should handle nested alineas correctly', async () => {
-            const tempFilePath = path.join(__dirname, 'test_rnc.txt');
-            fs.writeFileSync(tempFilePath, testContent);
+        it('should handle edge cases correctly', async () => {
+            const edgeCaseContent = `
+TITRE 1 Organisation des compétitions fédérales
+
+Chapitre 1 : Dispositions générales
+
+Section 1 : Dispositions générales
+
+Article 1 – Stade, phase, séance
+1. Les compétitions fédérales sont organisées en stades successifs.
+
+Section 3 : Inscriptions
+
+Article 3 – Inscriptions
+1. Les joueurs doivent s'inscrire avant la date limite.
+
+Chapitre 2 : Dispositions spécifiques
+
+Article 4 – Arbitrage
+1. Les arbitres sont désignés par la Fédération.
+
+TITRE 2 Organisation des compétitions nationales
+
+Chapitre 1 : Dispositions générales
+
+Article 5 – Organisation
+1. Les compétitions nationales sont organisées par les ligues.
+            `;
+
+            const tempFilePath = path.join(__dirname, 'test_rnc_edge_cases.txt');
+            fs.writeFileSync(tempFilePath, edgeCaseContent);
 
             try {
                 await parseRNC(tempFilePath);
 
                 const queryCalls = global.pool.query.mock.calls;
                 
-                // Check for nested alineas in Article 2
-                const article2Calls = queryCalls.filter(call => 
-                    call[1] && call[1][5] === 'Organisation'
-                );
+                // Verify sections are created with proper parent relationships
+                const sectionCalls = queryCalls.filter(call => call[0].includes('INSERT INTO rnc_sections'));
+                expect(sectionCalls.length).toBe(2);
+                
+                // Verify articles are linked to correct sections
+                const articleCalls = queryCalls.filter(call => call[0].includes('INSERT INTO rnc_articles'));
+                expect(articleCalls[0][1][2]).toBe('1'); // First article should be in section 1
+                expect(articleCalls[1][1][2]).toBe('1'); // Second article should be in section 1
+                expect(articleCalls[2][1][2]).toBe('2'); // Third article should be in section 2
+                
+                // Verify hierarchy relationships are maintained
+                const hierarchyCalls = queryCalls.filter(call => call[0].includes('INSERT INTO rnc_article_hierarchy'));
+                expect(hierarchyCalls.length).toBe(3);
+                expect(hierarchyCalls[0][1][0]).toBe(1); // First article
+                expect(hierarchyCalls[1][1][0]).toBe(2); // Second article
+                expect(hierarchyCalls[2][1][0]).toBe(3); // Third article
+            } finally {
+                fs.unlinkSync(tempFilePath);
+            }
+        });
 
-                expect(article2Calls.length).toBe(3); // 1 article + 2 alineas
-                expect(article2Calls[1][1][6]).toBe('a)');
-                expect(article2Calls[2][1][7]).toBe('A.');
+        it('should handle missing sections correctly', async () => {
+            const missingSectionContent = `
+TITRE 1 Organisation des compétitions fédérales
+
+Chapitre 1 : Dispositions générales
+
+Article 1 – Stade, phase, séance
+1. Les compétitions fédérales sont organisées en stades successifs.
+
+Article 2 – Organisation
+1. Les compétitions sont organisées par la Fédération.
+
+Chapitre 2 : Dispositions spécifiques
+
+Article 3 – Arbitrage
+1. Les arbitres sont désignés par la Fédération.
+            `;
+
+            const tempFilePath = path.join(__dirname, 'test_rnc_missing_sections.txt');
+            fs.writeFileSync(tempFilePath, missingSectionContent);
+
+            try {
+                await parseRNC(tempFilePath);
+
+                const queryCalls = global.pool.query.mock.calls;
+                
+                // Verify no sections were created
+                const sectionCalls = queryCalls.filter(call => call[0].includes('INSERT INTO rnc_sections'));
+                expect(sectionCalls.length).toBe(0);
+                
+                // Verify articles are still created
+                const articleCalls = queryCalls.filter(call => call[0].includes('INSERT INTO rnc_articles'));
+                expect(articleCalls.length).toBe(3);
+                
+                // Verify hierarchy relationships are maintained
+                const hierarchyCalls = queryCalls.filter(call => call[0].includes('INSERT INTO rnc_article_hierarchy'));
+                expect(hierarchyCalls.length).toBe(3);
+            } finally {
+                fs.unlinkSync(tempFilePath);
+            }
+        });
+
+        it('should handle malformed numbers correctly', async () => {
+            const malformedContent = `
+TITRE 1 Organisation des compétitions fédérales
+
+Chapitre 1 : Dispositions générales
+
+Section 1 : Dispositions générales
+
+Article 1 – Stade, phase, séance
+1. Les compétitions fédérales sont organisées en stades successifs.
+
+Article 2 – Organisation
+a) Les compétitions sont organisées par la Fédération.
+A. La Fédération peut déléguer l'organisation à des comités régionaux.
+
+Section 2 : Inscriptions
+
+Article 3 – Inscriptions
+1. Les joueurs doivent s'inscrire avant la date limite.
+
+Chapitre 2 : Dispositions spécifiques
+
+Article 4 – Arbitrage
+1. Les arbitres sont désignés par la Fédération.
+            `;
+
+            const tempFilePath = path.join(__dirname, 'test_rnc_malformed.txt');
+            fs.writeFileSync(tempFilePath, malformedContent);
+
+            try {
+                await parseRNC(tempFilePath);
+
+                const queryCalls = global.pool.query.mock.calls;
+                
+                // Verify articles are created with correct numbers
+                const articleCalls = queryCalls.filter(call => call[0].includes('INSERT INTO rnc_articles'));
+                expect(articleCalls[0][1][4]).toBe('1');
+                expect(articleCalls[1][1][4]).toBe('2');
+                expect(articleCalls[2][1][4]).toBe('3');
+                expect(articleCalls[3][1][4]).toBe('4');
+                
+                // Verify alineas are created with correct numbers
+                const alineaCalls = queryCalls.filter(call => call[0].includes('INSERT INTO rnc_articles') && call[1][6]);
+                expect(alineaCalls[0][1][6]).toBe('1.');
+                expect(alineaCalls[1][1][7]).toBe('a');
+                expect(alineaCalls[2][1][8]).toBe('A');
             } finally {
                 fs.unlinkSync(tempFilePath);
             }
