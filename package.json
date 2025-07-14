@@ -6,6 +6,8 @@
     "start": "PORT=3001 node node_modules/react-app-rewired/scripts/start.js",
     "build": "node node_modules/react-app-rewired/scripts/build.js",
     "test": "jest",
+    "e2e": "cypress run",
+    "e2e:open": "cypress open",
     "eject": "node node_modules/react-app-rewired/scripts/eject.js"
   },
   "dependencies": {
