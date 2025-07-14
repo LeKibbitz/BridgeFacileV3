@@ -1,113 +1,72 @@
 const fs = require('fs');
 const pdf = require('pdf-parse');
-const { createClient } = require('../../supabaseClient');
+const { supabase } = require('../../src/supabaseClient');
 
 // Read the PDF file
-const pdfPath = './RNC 2025-2026.pdf';
+const pdfPath = '../My Code and RNC suggestions/RNC 2025-2026.pdf';
 
 async function parsePDF() {
   try {
+    console.log('Reading PDF file...');
     const data = await pdf(fs.readFileSync(pdfPath));
     const text = data.text;
+    
+    console.log('Processing PDF content...');
+    // Split text into sections
+    const sections = text.split(/\n\n/);
     
     // Initialize variables for hierarchy
     let currentTitle = null;
     let currentChapter = null;
-    let currentArticle = null;
     let currentSection = null;
+    let currentArticle = null;
     let orderInTitle = 0;
     let orderInChapter = 0;
-    
-    // Split text into sections
-    const sections = text.split(/\n\n/);
+    let titleNumber = null;
+    let titleName = null;
+    let chapterNumber = null;
+    let chapterName = null;
     
     // Process each section
     for (const section of sections) {
+      if (!section.trim()) continue;
+      
       // Handle Titles
-      if (section.match(/^Titre\s+\d+/)) {
-        currentTitle = section;
+      const titleMatch = section.match(/^TITRE\s+(\d+)\s+(.+)/);
+      if (titleMatch) {
+        console.log(`Found Title: ${titleMatch[2]}`);
+        currentTitle = titleMatch[2];
         orderInTitle++;
         orderInChapter = 0;
         
-        const titleNumber = section.match(/\d+/)?.[0];
-        const article = {
-          title_number: titleNumber,
-          title_name: section,
-          is_title: true,
-          order_in_title: orderInTitle,
-          content: '',
-          pdf_path: pdfPath
-        };
+        titleNumber = titleMatch[1];
+        titleName = titleMatch[2];
         
         const { data: titleData, error: titleError } = await supabase
-          .from('rnc_articles')
-          .insert([article])
+          .from('rnc_article')
+          .insert([{
+            title_number: titleNumber,
+            title_name: titleName,
+            is_title: true,
+            order_in_title: orderInTitle,
+            content: '',
+            pdf_path: pdfPath,
+            created_by: 'system',
+            updated_by: 'system'
+          }])
           .select();
 
         if (titleError) throw titleError;
+        console.log(`Inserted Title ${titleNumber}: ${titleName}`);
         currentArticle = titleData[0];
         
-      } else if (section.match(/^Chapitre\s+\d+/)) {
-        // Handle Chapter
-        currentChapter = section;
-        orderInChapter++;
-        
-        const chapterNumber = section.match(/\d+/)?.[0];
-        const article = {
-          title_number: currentTitle?.match(/\d+/)?.[0],
-          chapter_number: chapterNumber,
-          chapter_name: section,
-          is_chapter: true,
-          order_in_chapter: orderInChapter,
-          order_in_title: orderInTitle,
-          content: '',
-          pdf_path: pdfPath,
-          parent_article_id: currentArticle?.id
-        };
-        
-        const { data: chapterData, error: chapterError } = await supabase
-          .from('rnc_articles')
-          .insert([article])
-          .select();
-
-        if (chapterError) throw chapterError;
-        currentArticle = chapterData[0];
-        
-      } else if (section.match(/^Article\s+\d+\.\d+/)) {
-        // Handle Article
-        const articleNumber = section.match(/Article\s+(\d+\.\d+)/)?.[1];
-        const [titleNum, chapterNum] = articleNumber.split('.').map(Number);
-        
-        const [title, content] = section.split(/\n/);
-        const article = {
-          title_number: titleNum,
-          chapter_number: chapterNum,
-          article_number: articleNumber,
-          title_name: title,
-          content: content.trim(),
-          pdf_path: pdfPath,
-          order_in_chapter: orderInChapter,
-          order_in_title: orderInTitle,
-          parent_article_id: currentArticle?.id
-        };
-        
-        const { data: articleData, error: articleError } = await supabase
-          .from('rnc_articles')
-          .insert([article])
-          .select();
-
-        if (articleError) throw articleError;
-        currentArticle = articleData[0];
-        
-        // Extract references and create relationships
-        const references = content.match(/Article\s+\d+\.\d+/g) || [];
-        for (const ref of references) {
-          const refNumber = ref.replace('Article ', '');
-          const relationship = {
-            parent_article_id: articleData[0].id,
-            child_article_id: (await supabase
-              .from('rnc_articles')
-              .select('id')
+      } else if (currentTitle) {
+        // Handle Chapters
+        const chapterMatch = section.match(/^Chapitre\s+(\d+)\s*:\s*(.+)/);
+        if (chapterMatch) {
+          console.log(`Found Chapter: ${chapterMatch[2]}`);
+          currentChapter = chapterMatch[2];
+          orderInChapter++;
               .eq('article_number', refNumber)
               .single())?.data?.id,
             relationship_type: 'references',

@@ -1,0 +1,29 @@
+name: Notifications
+
+on:
+  workflow_run:
+    types:
+      - completed
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    steps:
+      - name: Notify Slack
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ github.event.workflow_run.conclusion }}
+          fields: summary,workflow,commit,repo,ref,author,action,workflow_duration,timestamp
+          channel: '#deployments'
+          authorName: GitHub Actions
+          color: ${{ github.event.workflow_run.conclusion == 'success' && 'good' || github.event.workflow_run.conclusion == 'failure' && 'danger' || 'warning' }}
+          payload: |
+            {
+              "fields": [
+                {
+                  "title": "Commit Message",
+                  "value": "${{ github.event.workflow_run.head_commit.message }}"
+                }
+              ]
+            }

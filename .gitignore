@@ -4,6 +4,9 @@
 /node_modules
 /.pnp
 .pnp.js
+/mobile-app/node_modules
+/mobile-app-new/node_modules
+/mobile-app.backup/node_modules
 
 # testing
 /coverage

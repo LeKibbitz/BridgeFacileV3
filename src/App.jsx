@@ -10,7 +10,7 @@ async function testConnection() {
   try {
     const { data, error } = await supabase
       .from('code_laws')
-      .select('law_number, title')
+      .select('article_number, article_name')
       .limit(1);
     
     if (error) throw error;

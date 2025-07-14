@@ -7,6 +7,7 @@ const { createClient } = require('@supabase/supabase-js');
 const supabaseUrl = 'https://aqokcjsmajnpfkladubp.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFxb2tjanNtYWpucGZrbGFkdWJwIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MTM5ODg5NSwiZXhwIjoyMDY2OTc0ODk1fQ.lzWw_o-HtNRCIHAVlq3ucBkHh0ZSRsrHYvE4VwYjafw';
 
+// Configure Supabase client to avoid punycode
 const supabase = createClient(supabaseUrl, supabaseKey, {
     auth: {
         persistSession: false,
@@ -16,6 +17,13 @@ const supabase = createClient(supabaseUrl, supabaseKey, {
     global: {
         headers: {
             'Accept': 'application/json, text/plain, */*'
+        },
+        fetch: async (url, options) => {
+            // Use native URL API
+            const urlObj = new URL(url);
+            // Use direct string concatenation to avoid punycode
+            const urlStr = `${urlObj.protocol}//${urlObj.hostname}${urlObj.pathname}${urlObj.search}`;
+            return fetch(urlStr, options);
         }
     }
 });
@@ -52,11 +60,12 @@ async function insertArticlesToSupabase(articles, isRNC) {
             updated_by: 'system'
         }));
 
-        // Insert data into Supabase
+        // Insert articles with upsert (ON CONFLICT DO NOTHING)
         const { data, error } = await serviceRoleSupabase
             .from(tableName)
             .upsert(insertData, {
-                onConflict: ['article_number']
+                onConflict: ['title_number', 'chapter_number', 'section_number', 'article_number', 'alinea'],
+                ignoreDuplicates: true
             });
 
         if (error) throw error;
@@ -90,9 +99,6 @@ function updateStatus(message) {
     console.log(`Errors: ${status.errors.length}`);
 }
 
-// Insert articles into database
-
-
 // Constants for parsing
 const DOCUMENT_TYPES = {
     RNC: 'rnc',
@@ -116,7 +122,6 @@ class DocumentParser {
             status: 'pending',
             percentage: 0
         };
-        this.progressPercentage = 0;
     }
 
     updateProgress(status, percentage) {
@@ -322,21 +327,13 @@ class DocumentParser {
                             articleContent += ' ' + cleanedLine;
                             console.log('Adding content to article:', cleanedLine);
                         }
-                    }
-
-                    // Only add content if we're in an article and the line isn't empty
-                    if (this.currentArticle && line.trim()) {
-                        // Clean up line content
-                        const cleanedLine = line.trim().replace(/\s+/g, ' ');
-                        articleContent += cleanedLine + '\n';
-                        console.log('Adding content to article:', cleanedLine);
                     } else {
                         console.error(`Error parsing content: ${line}`);
                         throw new Error(`Error parsing content: ${line}`);
                     }
                 }
             }
-
+            
             // Process last article/alinea if exists
             if (currentArticle && articleContent.trim()) {
                 console.log('Processing final article/alinea content:', articleContent);
@@ -353,165 +350,124 @@ class DocumentParser {
                     sub_alinea: this.currentContext.subAlinea.number || null,
                     sub_sub_alinea: this.currentContext.subSubAlinea.number || null,
                     content: articleContent.trim(),
-                    hypertexte_link: this.generateHypertexteLink()
+                    hypertexte_link: this.generateHypertexteLink(),
+                    created_by: 'system',
+                    updated_by: 'system'
                 };
-                articles.push(articleRecord);
-                console.log(`Parsed final article ${this.currentContext.article.number}${this.currentContext.alinea.number ? '.' + this.currentContext.alinea.number : ''}`);
-                console.log('Final article record:', articleRecord);
+
+                await insertArticlesToSupabase([articleRecord], this.documentType === DOCUMENT_TYPES.RNC);
+                console.log('Final article/alinea processed successfully');
             }
 
-            console.log(`Found ${articles.length} articles`);
-            console.log('First article sample:', articles[0]);
-
-            // Insert articles using Supabase API
-            try {
-                await insertArticlesToSupabase(articles, true);
-                console.log(`Successfully inserted ${articles.length} articles`);
-                this.updateProgress('complete', 100);
-                return articles;
-            } catch (error) {
-                console.error('Error inserting articles:', error);
-                throw error;
-            }
+            this.updateProgress('completed', 100);
+            console.log('PDF parsing completed successfully');
+            return articles;
         } catch (error) {
             console.error('Error parsing PDF:', error);
             throw error;
-        }
-    }
-}
-}
-}
-    }
-
-    // Process last article/alinea if exists
-    if (currentArticle && articleContent.trim()) {
-        console.log('Processing final article/alinea content:', articleContent);
-        const articleRecord = {
-            title_number: this.currentContext.title.number,
-            title_name: this.currentContext.title.name,
-            chapter_number: this.currentContext.chapter.number,
-            chapter_name: this.currentContext.chapter.name,
-            section_number: this.currentContext.section.number,
-            section_name: this.currentContext.section.name,
-            article_number: this.currentContext.article.number,
-            article_name: this.currentContext.article.name,
-            alinea: this.currentContext.alinea.number || null,
-            sub_alinea: this.currentContext.subAlinea.number || null,
-            sub_sub_alinea: this.currentContext.subSubAlinea.number || null,
-            content: articleContent.trim(),
-            hypertexte_link: this.generateHypertexteLink()
-        };
-        articles.push(articleRecord);
-        console.log(`Parsed final article ${this.currentContext.article.number}${this.currentContext.alinea.number ? '.' + this.currentContext.alinea.number : ''}`);
-        console.log('Final article record:', articleRecord);
-    }
-
-    console.log(`Found ${articles.length} articles`);
-    console.log('First article sample:', articles[0]);
-
-    // Insert articles using Supabase API
-
-// Insert articles using Supabase API
-try {
-    await insertArticlesToSupabase(articles, true);
-    console.log(`Successfully inserted ${articles.length} articles`);
-    this.updateProgress('complete', 100);
-    return articles;
-} catch (error) {
-    console.error('Error parsing PDF:', error);
-    throw error;
-}
-} catch (error) {
-    console.error('Error parsing PDF:', error);
-    throw error;
-}
-
-// ... (rest of the code remains the same)
-
-extractSubSubAlineas(content) {
-    // Split content into sub-sub-alineas using patterns
-    const subSubAlineaPatterns = [
-        /^[a-z]$/,      // Lowercase letter sub-sub-alineas (a, b, c)
-        /^[A-Z]$/,      // Uppercase letter sub-sub-alineas (A, B, C)
-        /^[a-z]\)/,     // Lowercase letter with parenthesis (a), b), etc.)
-        /^[A-Z]\)/,     // Uppercase letter with parenthesis (A), B), etc.)
-        /^[a-z]\)$/g,    // Lowercase letter with closing parenthesis (a), b), etc.)
-        /^[A-Z]\)$/g,    // Uppercase letter with closing parenthesis (A), B), etc.)
-        /^\([IiVvXx]+\)/  // Roman numerals with parenthesis (i), ii), etc.)
-    ];
-    
-    const extractedSubSubAlineas = [];
-    let currentContent = content;
-    const subSubAlineaPattern = new RegExp(subSubAlineaPatterns.join('|'), 'g');
-    let match;
+        // Split content into sub-sub-alineas using patterns
+        const subSubAlineaPatterns = [
+            /^[a-z]$/,      // Lowercase letter sub-sub-alineas (a, b, c)
+            /^[A-Z]$/,      // Uppercase letter sub-sub-alineas (A, B, C)
+            /^[a-z]\)/,     // Lowercase letter with parenthesis (a), b), etc.)
+            /^[A-Z]\)/,     // Uppercase letter with parenthesis (A), B), etc.)
+            /^[a-z]\)$/g,    // Lowercase letter with closing parenthesis (a), b), etc.)
+            /^[A-Z]\)$/g,    // Uppercase letter with closing parenthesis (A), B), etc.)
+            /^\([IiVvXx]+\)/  // Roman numerals with parenthesis (i), ii), etc.)
+        ];
         
-    // Process each sub-sub-alinea
-    while ((match = subSubAlineaPattern.exec(currentContent)) !== null) {
-        const subSubAlinea = {
-            number: match[0].match(/^[IiVvXx]+/)[0],
-            content: match[1].trim()
-        };
-        extractedSubSubAlineas.push(subSubAlinea);
-        currentContent = currentContent.replace(match[0], '');
-    };
+        const extractedSubSubAlineas = [];
+        let currentContent = content;
+        const subSubAlineaPattern = new RegExp(subSubAlineaPatterns.join('|'), 'g');
+        let match;
 
-    return extractedSubSubAlineas;
-};
+        // Process each sub-sub-alinea
+        while ((match = subSubAlineaPattern.exec(currentContent)) !== null) {
+            const subSubAlinea = {
+                number: match[0].match(/^[IiVvXx]+/)[0],
+                content: match[1].trim()
+            };
+            extractedSubSubAlineas.push(subSubAlinea);
+            currentContent = currentContent.replace(match[0], '');
+        }
+
+        return extractedSubSubAlineas;
+    } catch (error) {
+        console.error('Error extracting sub-sub-alineas:', error);
+        throw error;
+    }
+}
 
 async insertTitle(number, name) {
-    const titleRecord = {
-        title_number: number,
-        title_name: name,
-        created_by: 'system',
-        updated_by: 'system'
-    };
+    try {
+        const titleRecord = {
+            title_number: number,
+            title_name: name,
+            created_by: 'system',
+            updated_by: 'system'
+        };
 
-    const { data: titleData, error: titleError } = await supabase
-        .from('rnc_titles')
-        .upsert(titleRecord, {
-            onConflict: ['title_number']
-        });
+        const { data: titleData, error: titleError } = await supabase
+            .from('rnc_titles')
+            .upsert(titleRecord, {
+                onConflict: ['title_number']
+            });
 
-    if (titleError) throw titleError;
-    return titleData[0];
+        if (titleError) throw titleError;
+        return titleData[0];
+    } catch (error) {
+        console.error('Error inserting title:', error);
+        throw error;
+    }
 }
 
 async insertChapter(number, name) {
-    const chapterRecord = {
-        title_number: this.currentContext.title.number,
-        chapter_number: number,
-        chapter_name: name,
-        created_by: 'system',
-        updated_by: 'system'
-    };
+    try {
+        const chapterRecord = {
+            title_number: this.currentContext.title.number,
+            chapter_number: number,
+            chapter_name: name,
+            created_by: 'system',
+            updated_by: 'system'
+        };
 
-    const { data: chapterData, error: chapterError } = await supabase
-        .from('rnc_chapters')
-        .upsert(chapterRecord, {
-            onConflict: ['title_number', 'chapter_number']
-        });
+        const { data: chapterData, error: chapterError } = await supabase
+            .from('rnc_chapters')
+            .upsert(chapterRecord, {
+                onConflict: ['title_number', 'chapter_number']
+            });
 
-    if (chapterError) throw chapterError;
-    return chapterData[0];
+        if (chapterError) throw chapterError;
+        return chapterData[0];
+    } catch (error) {
+        console.error('Error inserting chapter:', error);
+        throw error;
+    }
 }
 
 async insertAlinea(articleData, alinea) {
-    const alineaRecord = {
-        article_id: articleData.id,
-        alinea_number: alinea.number,
-        content: alinea.content,
-        created_by: 'system',
-        updated_by: 'system'
-    };
+    try {
+        const alineaRecord = {
+            article_id: articleData.id,
+            alinea_number: alinea.number,
+            content: alinea.content,
+            created_by: 'system',
+            updated_by: 'system'
+        };
 
-    const { data: alineaData, error: alineaError } = await supabase
-        .from('rnc_alineas')
-        .upsert(alineaRecord, {
-            onConflict: ['article_id', 'alinea_number']
-        });
+        const { data: alineaData, error: alineaError } = await supabase
+            .from('rnc_alineas')
+            .upsert(alineaRecord, {
+                onConflict: ['article_id', 'alinea_number']
+            });
 
-    if (alineaError) throw alineaError;
-    return alineaData[0];
+        if (alineaError) throw alineaError;
+        return alineaData[0];
+    } catch (error) {
+        console.error('Error inserting alinea:', error);
+        throw error;
+    }
+}
 }
 
 async parseCodeLawSection(section) {
@@ -541,27 +497,10 @@ async parseCodeLawSection(section) {
                     {
                         onConflict: ['article_number']
                     }
-
-    async parseCodeLawSection(section) {
-        try {
-            // Extract article (e.g., "Article 1 – Les compétitions")
-            const articleMatch = section.match(/Article\s+(\d+)\s*–\s*(.+)$/);
-            if (articleMatch) {
-                this.currentContext.article.number = articleMatch[1].trim();
-                this.currentContext.article.name = articleMatch[2].trim();
-                const articleContent = section.replace(/Article\s+\d+\s*–\s*.+\s*/, '');
-
-                // Construct hypertexte link
-                const hypertexteLink = `/code-laws/article-${this.currentContext.article.number}`;
-
-                // Insert article with hypertexte link
-                const { data: articleData, error: articleError } = await pool.query(
-                    'INSERT INTO code_laws (article_number, article_name, content, hypertexte_link, created_by, updated_by) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
-                    [this.currentContext.article.number, this.currentContext.article.name, articleContent, hypertexteLink, 'system', 'system']
                 );
 
-                if (articleError) throw articleError;
-                return articleData[0];
+            if (articleError) throw articleError;
+            return articleData[0];
         }
 
         // Extract section (e.g., "Section 1 : Dispositions générales")
@@ -601,10 +540,11 @@ async parseCodeLawSection(section) {
             };
             
             // Insert article with hypertexte link
-            const { data: articleData, error: articleError } = await pool.query(
-                'INSERT INTO rnc_articles (title_number, title_name, chapter_number, chapter_name, article_number, article_name, content, hypertexte_link, created_by, updated_by) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *',
-                [articleRecord.title_number, articleRecord.title_name, articleRecord.chapter_number, articleRecord.chapter_name, articleRecord.article_number, articleRecord.article_name, articleRecord.content, articleRecord.hypertexte_link, articleRecord.created_by, articleRecord.updated_by]
-            );
+            const { data: articleData, error: articleError } = await supabase
+                .from('rnc_articles')
+                .upsert(articleRecord, {
+                    onConflict: ['article_number']
+                });
             
             if (articleError) throw articleError;
             
@@ -619,34 +559,38 @@ async parseCodeLawSection(section) {
             }
         }
     } catch (error) {
-        console.error('Error parsing RNC section:', error);
+        console.error('Error parsing code law section:', error);
         throw error;
     }
 }
 
 async insertSection(sectionNumber, sectionName) {
-    const sectionRecord = {
-        title_number: this.currentContext.title.number,
-        title_name: this.currentContext.title.name,
-        chapter_number: this.currentContext.chapter.number,
-        chapter_name: this.currentContext.chapter.name,
-        section_number: sectionNumber,
-        section_name: sectionName,
-        created_by: 'system',
-        updated_by: 'system'
-    };
+    try {
+        const sectionRecord = {
+            title_number: this.currentContext.title.number,
+            title_name: this.currentContext.title.name,
+            chapter_number: this.currentContext.chapter.number,
+            chapter_name: this.currentContext.chapter.name,
+            section_number: sectionNumber,
+            section_name: sectionName,
+            created_by: 'system',
+            updated_by: 'system'
+        };
 
-    const { data: sectionData, error: sectionError } = await supabase
-        .from('rnc_sections')
-        .upsert(sectionRecord, {
-            onConflict: ['title_number', 'chapter_number', 'section_number']
-        });
+        const { data: sectionData, error: sectionError } = await supabase
+            .from('rnc_sections')
+            .upsert(sectionRecord, {
+                onConflict: ['title_number', 'chapter_number', 'section_number']
+            });
 
-    if (sectionError) throw sectionError;
-    return sectionData[0];
-}
+        if (sectionError) throw sectionError;
+        return sectionData[0];
+    } catch (error) {
+        console.error('Error inserting section:', error);
+        throw error;
+    }
 
-async parseCodeLawSection(section) {
+    async parseCodeLawSection(section) {
     try {
         // Extract article (e.g., "Article 1 – Les compétitions")
         const articleMatch = section.match(/Article\s+(\d+)\s*–\s*(.+)$/);
@@ -678,10 +622,67 @@ async parseCodeLawSection(section) {
             if (articleError) throw articleError;
             return articleData[0];
         }
+
+        // Extract section (e.g., "Section 1 : Dispositions générales")
+        const sectionMatch = section.match(/^Section\s+(\d+)\s*:\s*(.+)$/);
+        if (sectionMatch) {
+            this.currentContext.section.number = sectionMatch[1].trim();
+            this.currentContext.section.name = sectionMatch[2].trim();
+            await this.insertSection(this.currentContext.section.number, this.currentContext.section.name);
+            return;
+        }
+
+        // Extract article (e.g., "Article 6 – Stade, phase, séance")
+        const articleMatch = section.match(/Article\s+(\d+)\s*–\s*(.+)$/);
+        if (articleMatch) {
+            this.currentContext.article.number = articleMatch[1].trim();
+            this.currentContext.article.name = articleMatch[2].trim();
+            const articleContent = section.replace(/Article\s+\d+\s*–\s*.+\s*/, '');
+            
+            // Construct hypertexte link with section if available
+            const sectionPart = this.currentContext.section.number ? `/section-${this.currentContext.section.number}` : '';
+            const hypertexteLink = `/rnc/titre-${this.currentContext.title.number}/chapitre-${this.currentContext.chapter.number}${sectionPart}/article-${this.currentContext.article.number}`;
+
+            // Insert article with title and chapter context (no section for hyperlinks)
+            const articleRecord = {
+                title_number: this.currentContext.title.number,
+                title_name: this.currentContext.title.name,
+                chapter_number: this.currentContext.chapter.number,
+                chapter_name: this.currentContext.chapter.name,
+                section_number: this.currentContext.section.number,
+                section_name: this.currentContext.section.name,
+                article_number: this.currentContext.article.number,
+                article_name: this.currentContext.article.name,
+                content: articleContent,
+                hypertexte_link: hypertexteLink,
+                created_by: 'system',
+                updated_by: 'system'
+            };
+            
+            // Insert article with hypertexte link
+            const { data: articleData, error: articleError } = await supabase
+                .from('rnc_articles')
+                .upsert(articleRecord, {
+                    onConflict: ['article_number']
+                });
+            
+            if (articleError) throw articleError;
+            
+            // Extract alineas
+            const alineas = this.extractAlineas(articleContent);
+            
+            // Process each alinea
+            for (const alinea of alineas) {
+                this.currentContext.alinea.number = alinea.number;
+                this.currentContext.alinea.content = alinea.content;
+                await this.insertAlinea(articleData[0], alinea);
+            }
+        }
     } catch (error) {
         console.error('Error parsing code law section:', error);
         throw error;
     }
+}
 
 // Export functions to start parsing
 module.exports = {
@@ -697,20 +698,18 @@ module.exports = {
     }
 };
 
-(async (async () => {
+if (require.main === module) {
     try {
         const filePath = process.argv[2];
         if (!filePath) {
             console.error('Usage: node parse_documents.js <PDF_FILE_PATH>');
             process.exit(1);
-            return;
         }
 
         const fs = require('fs');
         if (!fs.existsSync(filePath)) {
             console.error(`File not found: ${filePath}`);
             process.exit(1);
-            return;
         }
 
         console.log('Starting script execution');
@@ -721,7 +720,7 @@ module.exports = {
         console.log('Creating DocumentParser instance');
         const parser = new DocumentParser(DOCUMENT_TYPES.RNC);
         console.log('Parser instance created');
-
+        
         // Add error handler for uncaught exceptions
         process.on('uncaughtException', (error) => {
             console.error('Uncaught Exception:', error);
@@ -741,4 +740,4 @@ module.exports = {
         console.error('Stack trace:', error.stack);
         process.exit(1);
     }
-}))();
+}
