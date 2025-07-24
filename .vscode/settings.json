@@ -20,5 +20,17 @@
   ],
   "[typescript]": {
     "editor.defaultFormatter": "denoland.vscode-deno"
-  }
+  },
+  "sqltools.connections": [
+    {
+      "name": "Supabase Project",
+      "driver": "PostgreSQL",
+      "server": "db.dzcnmebryowcxwfvrgrr.supabase.co",
+      "port": 5432,
+      "database": "postgres",
+      "username": "postgres",
+      "askForPassword": true,
+      "connectionTimeout": 30
+    }
+  ]
 }
